@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>IDPP City Demand Forecaster · 4-Round · A/B 시나리오</title>
+  <title>원자력 발전소 엔지니어링 마스터 · 4라운드 · (GWh)</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <style>
     :root{ --bg:#0b1020;--panel:#121830;--muted:#1a2140;--ink:#e7ecff;--ink-2:#b5c0ff;--ink-3:#8fa1ff;--accent:#6ea8ff;--accent-2:#9ad0ff;--good:#39d98a;--warn:#ffd166;--bad:#ff6b6b;--card:#10172a;--radius:16px;--shadow:0 10px 30px rgba(0,0,0,.35);} 
@@ -52,7 +52,7 @@
     .tabs button.hl{outline:2px solid var(--accent);box-shadow:0 0 0 3px rgba(110,168,255,.25)}
     .tabs button.active{background:#ffffff;color:#0e1430;border-color:#ffffff}
 
-    .bigStats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+    .bigStats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
     .stat{background:#0e1430;border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:14px 16px}
     .stat .k{font-size:14px;color:var(--ink-2);margin-bottom:4px}
     .stat .v{font-size:28px;font-weight:800;letter-spacing:.2px}
@@ -68,19 +68,21 @@
     .toast{background:#121830;border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:18px 20px;min-width:260px;text-align:center;box-shadow:var(--shadow);animation:pop .18s ease-out}
     .toast h3{margin:0 0 4px 0;font-size:18px}
     .toast p{margin:0;font-size:14px;color:var(--ink-2)}
-    /* Bigger round-change toast */
     #roundToast .toast{min-width:520px;padding:34px 38px}
     #roundToast .toast h3{font-size:28px}
     #roundToast .toast p{font-size:20px}
     @keyframes pop{from{transform:translateY(4px) scale(.98);opacity:.0}to{transform:translateY(0) scale(1);opacity:1}}
+    .cta{font-size:18px;padding:16px 20px;width:100%}
+    #codeInput{font-size:16px;padding:14px 14px}
+    #btnAddCode{font-size:16px;padding:12px 16px}
   </style>
 </head>
 <body>
   <header>
     <div class="wrap brand">
       <div class="logo" aria-hidden></div>
-      <h1>IDPP City Demand Forecaster · 4-Round</h1>
-      <div style="margin-left:auto" class="muted">A/B 시나리오 · 2010 시드 → 2025 예측</div>
+      <h1>원자력 발전소 엔지니어링 마스터 · 4라운드</h1>
+      <div style="margin-left:auto" class="muted"><strong>단위: GWh/월</strong> · 2010 시드 → 2025 예측</div>
     </div>
   </header>
 
@@ -113,6 +115,8 @@
         </div>
         <div class="small muted" style="margin-top:8px">결과 공개 전, 입력된 카드만으로 산출합니다.</div>
       </div>
+
+      
     </aside>
 
     <!-- Right: Runtime -->
@@ -122,20 +126,19 @@
         <div class="bigStats" role="group" aria-label="현재 상태">
           <div class="stat"><div class="k">현재 라운드</div><div class="v" id="roundNow">—</div></div>
           <div class="stat"><div class="k">현재 월</div><div class="v" id="monthNow">—</div></div>
-          <div class="stat"><div class="k">시나리오</div><div class="v" id="scenarioNow">—</div></div>
         </div>
       </div>
 
       <div class="section">
         <h2>예측</h2>
         <div>
-          <label>예상 도시 전력 수요량</label>
+          <label>예상 도시 전력 수요량 (GWh)</label>
           <input id="predRange" type="text" readonly value="—" placeholder="최저 ~ 최고">
         </div>
         <div class="small muted" style="margin-top:6px">시즌 기초값(2010) + 연도 성장(α) + 기온 민감도(β)</div>
         <div style="margin-top:10px">
-          <button id="btnPredict" class="primary" disabled>예측 갱신</button>
-          <button id="btnNext" class="ghost" disabled>다음 달로 이동</button>
+          <button id="btnPredict" class="primary cta" disabled>도시 전력 수요 예측</button>
+          <button id="btnNext" class="ghost cta" disabled>다음 달로 넘어가기</button>
         </div>
       </div>
 
@@ -145,7 +148,7 @@
         <canvas id="dataChart" height="230" aria-label="연구데이터 차트"></canvas>
         <div id="yearSummary" class="small" style="margin-top:8px"></div>
         <table id="yearTable" style="margin-top:8px">
-          <thead><tr><th>월</th><th>전력수요(EU)</th><th>월별기온(°C)</th></tr></thead>
+          <thead><tr><th>월</th><th>전력수요(GWh)</th><th>월별기온(°C)</th></tr></thead>
           <tbody></tbody>
         </table>
       </div>
@@ -158,7 +161,7 @@
               <th>라운드</th>
               <th>월</th>
               <th>사전 적중률</th>
-              <th>예측 수요(EU)</th>
+              <th>예상 범위(GWh)</th>
             </tr>
           </thead>
           <tbody></tbody>
@@ -171,7 +174,7 @@
   <!-- Toast: round/month -->
   <div id="roundToast" class="overlay" aria-hidden="true">
     <div class="toast">
-      <h3 id="toastTitle">다음 라운드</h3>
+      <h3 id="toastTitle">라운드 진행</h3>
       <p id="toastText">라운드 — / —월</p>
     </div>
   </div>
@@ -190,9 +193,7 @@
   <!-- Modal: scenario selection (시작 전 전용) -->
   <div id="modal" class="overlay">
     <div class="toast" style="min-width:340px">
-      <h2 style="margin-top:0">시나리오 선택</h2>
-      <label>시나리오</label>
-      <select id="scenarioSelect"><option value="A">A</option><option value="B">B</option></select>
+      <h2 style="margin-top:0">새 게임 시작</h2>
       <label style="margin-top:10px">시작 월</label>
       <select id="startMonth"></select>
       <div style="margin-top:16px;display:flex;gap:8px;justify-content:flex-end">
@@ -219,14 +220,61 @@
     const MONTHS = ["1월","2월","3월","4월","5월","6월","7월","8월","9월","10월","11월","12월"];
     const BETA = [0.002,0.002,0.005,0.006,0.010,0.015,0.020,0.020,0.012,0.006,0.003,0.002];
 
+    // 월별 기온 합성용 베이스(2011) 및 2010 기준 벡터
+    const TBASE2011 = [1.7,3.7,7.2,12.2,17.2,21.2,23.2,22.7,18.2,13.2,7.7,3.2];
+    const TBASE2010 = TBASE2011.map(v=>+(v-0.2).toFixed(1)); // 2010은 2011보다 약간 낮게
+    const WARM_RATE = 0.03; // 연 0.03°C 상승
+    function synthMonthlyTemps(y){ const delta=(y-2010)*WARM_RATE; return TBASE2010.map(v=>+(v+delta).toFixed(1)); }
+    function getMonthlyTemp(y,m){ const t=state.tempCards.find(t=>t.y===y); if(t&&t.temps&&t.temps.length===12){ return t.temps[m-1]; } const est=synthMonthlyTemps(y); return est[m-1]; }
+
+    // 모든 수치 단위: GWh/월
+
+    // 2025 정답(단위: GWh)
     const TRUE_2025 = {
-      A: { demand: [10.0,9.5,9.0,9.0,10.5,12.0,14.0,15.0,12.5,11.0,10.0,11.0] },
-      B: { demand: [10.2,9.4,9.1,9.3,10.1,12.3,14.8,15.7,12.0,10.7,9.7,11.1] }
+      A: { demand: [10.0,9.5,9.0,9.0,10.5,12.0,14.0,15.0,12.5,11.0,10.0,11.0] }
     };
+    // 2010 기초(단위: GWh) = 2025의 80%
     const BASE_2010 = {
-      A: TRUE_2025.A.demand.map(v => +(v*0.8).toFixed(1)),
-      B: TRUE_2025.B.demand.map(v => +(v*0.8).toFixed(1))
+      A: TRUE_2025.A.demand.map(v => +(v*0.8).toFixed(1))
     };
+
+    // ================== Embedded DB (A 전용) ==================
+    const CARD_DB = {}; // 기본은 비어두고, 아래 GA6 카드로 채웁니다.
+
+    // ---- A-only: GA6 카드(6개월) 무작위 월 구성
+    const GA6_PLAN_A = [
+      {code:'Q7M', year:2010, months:[1,3,4,7,10,12]},
+      {code:'L3Z', year:2010, months:[2,5,6,8,9,11]},
+      {code:'H9X', year:2012, months:[1,2,4,6,9,12]},
+      {code:'T2V', year:2012, months:[3,5,7,8,10,11]},
+      {code:'R5K', year:2014, months:[1,5,6,7,9,12]},
+      {code:'M8J', year:2014, months:[2,3,4,8,10,11]},
+      {code:'C4P', year:2017, months:[1,4,6,8,9,11]},
+      {code:'N1D', year:2017, months:[2,3,5,7,10,12]},
+      {code:'V6S', year:2019, months:[1,3,5,6,8,12]},
+      {code:'Y0A', year:2019, months:[2,4,7,9,10,11]},
+      {code:'B2Q', year:2022, months:[1,2,6,7,9,11]},
+      {code:'W9F', year:2024, months:[3,4,5,8,10,12]},
+    ];
+    const ALPHA_TRUE = 0.0166666667; // per year so that 2010→2025 grows ~25%
+
+    // Monthly temperature generator (base on 2011 profile + gentle warming)
+    const BASE_TEMPS_2011 = [1.7,3.7,7.2,12.2,17.2,21.2,23.2,22.7,18.2,13.2,7.7,3.2];
+    const WARMING_PER_YEAR = 0.04; // °C/year (plausible small trend)
+    function monthlyTempsForYear(y){
+      const dy = y - 2011;
+      return BASE_TEMPS_2011.map(v => +(v + dy*WARMING_PER_YEAR).toFixed(1));
+    }
+    function buildGA6Items(year, months){
+      const g = 1 + ALPHA_TRUE*(year-2010);
+      const temps = monthlyTempsForYear(year);
+      return months.map(m => ({ m, val: +(BASE_2010.A[m-1]*g).toFixed(1), temp: temps[m-1] }));
+    }
+    function injectGA6(){
+      GA6_PLAN_A.forEach(p => {
+        CARD_DB[p.code] = { type:'GA6', scenario:'A', year:p.year, items: buildGA6Items(p.year, p.months) };
+      });
+    }
 
     // ================== State ==================
     const state = {
@@ -236,112 +284,11 @@
       round:0,
       maxRounds:4,
       monthNow:1,
-      demandCards:[], // {y,m,val}
+      demandCards:[], // {y,m,val} in GWh
       tempCards:[],   // {y, temps:[12]}
-      appliedCodes:[]
+      appliedCodes:[],
+      cardDB:{},
     };
-
-    // ================== Built-in CARD_DB ==================
-    const CARD_DB = (()=>{
-      // Demand (내장 생성 규칙)
-      const YEARS_GA3 = [2012,2014,2016,2017,2018,2019,2021,2023];
-      const TRIPLETS = [[1,3,7],[2,6,10],[4,8,11],[5,9,12]];
-      const YEARS_GA2 = [2010,2011,2012,2013,2014,2015,2018,2019,2020,2021,2022,2024];
-      const PAIRS = [[2,8],[5,11],[3,9],[6,12]];
-
-      // Temp (연도별 월별기온, 코드 고정: VGV/QFR/T6G/ZCH/Y26/YBM/YVP)
-      const TEMP_FIXED = [
-        {code:'VGV', years:[2010,2011,2013]},
-        {code:'QFR', years:[2012,2015]},
-        {code:'T6G', years:[2014,2016]},
-        {code:'ZCH', years:[2017,2019]},
-        {code:'Y26', years:[2020,2021]},
-        {code:'YBM', years:[2018,2022]},
-        {code:'YVP', years:[2023,2024]}
-      ];
-
-      const TRUE_2025 = { A:[10.0,9.5,9.0,9.0,10.5,12.0,14.0,15.0,12.5,11.0,10.0,11.0], B:[10.2,9.4,9.1,9.3,10.1,12.3,14.8,15.7,12.0,10.7,9.7,11.1] };
-      const BASE_2010 = { A:TRUE_2025.A.map(v=>v*0.8), B:TRUE_2025.B.map(v=>v*0.8) };
-      const alphaTrue = 0.0185; // ~1.85%/yr
-      function tempMean(year){ return 12.6 + 0.06*(year-2010); }
-      function tempMonthly(year){
-        const base = tempMean(year);
-        const offsets = [-7.5,-5.5,-2.0,3.0,8.0,12.0,14.0,13.5,9.0,4.0,-1.5,-6.0];
-        const avg = offsets.reduce((a,b)=>a+b,0)/offsets.length;
-        return offsets.map(o=> +(base + (o-avg)).toFixed(1));
-      }
-      function demandEU(scn, year, m){ const base=BASE_2010[scn][m-1]; const t=year-2010; const growth=1+alphaTrue*t; const dT=0.06*t; const beta=BETA[m-1]; const tempF=1+beta*dT; return +(base*growth*tempF).toFixed(1); }
-
-      const db={};
-      ['A','B'].forEach(scn=>{
-        YEARS_GA3.forEach((y,idx)=>{ const tri=TRIPLETS[idx%TRIPLETS.length]; const items=tri.map(m=>({m,val:demandEU(scn,y,m)})); db[`${scn}${y}${tri.join('')}`]={ type:'GA3', scenario:scn, year:y, items }; });
-        YEARS_GA2.forEach((y,idx)=>{ const pr=PAIRS[idx%PAIRS.length]; const items=pr.map(m=>({m,val:demandEU(scn,y,m)})); db[`${scn}${y}${pr.join('')}`]={ type:'GA2', scenario:scn, year:y, items }; });
-      });
-      TEMP_FIXED.forEach(({code,years})=>{ db[code] = { type:'NA2', items: years.map(y=>({ y, temps: tempMonthly(y) })) }; });
-      return db;
-    })();
-
-    // ================== Legacy/Compatibility ==================
-    const ALPHA_TRUE = 0.0185;
-    const TEMP_SLOPE = 0.06;
-    function demandEU_truth(scn, year, m){
-      const base = BASE_2010[scn]?.[m-1];
-      if(base==null) return null;
-      const t=year-2010;
-      const growth=1+ALPHA_TRUE*t;
-      const dT=TEMP_SLOPE*t;
-      const beta=BETA[m-1];
-      const tempF=1+beta*dT;
-      return +(base*growth*tempF).toFixed(1);
-    }
-
-    const LEGACY_ALIAS = {
-      'VAD': { type:'GA3', scenario:'A', year:2017, months:[5,9,12] },
-      'LGY': { type:'GA2', scenario:'A', year:2011, months:[5,11] },
-      'AGR': { type:'GA3', scenario:'A', year:2012, months:[1,3,7] },
-      'NYP': { type:'GA2', scenario:'A', year:2014, months:[2,8] }
-    };
-    // 사용자 제공 3자리 코드 전체 수용: UJM, EBX, KGQ, G5E, 3FG, Q69, GHX, 6RC, N6S, QBG, VD9, FZS, GFD, ZMQ, 9TM, 7TZ, JF2
-    (function seedMoreLegacyAliases(){
-      const EXTRA_CODES = ['UJM','EBX','KGQ','G5E','3FG','Q69','GHX','6RC','N6S','QBG','VD9','FZS','GFD','ZMQ','9TM','7TZ','JF2'];
-      const YEARS_GA3 = [2012,2014,2016,2017,2018,2019,2021,2023];
-      const TRIPLETS = [[1,3,7],[2,6,10],[4,8,11],[5,9,12]];
-      const YEARS_GA2 = [2010,2011,2012,2013,2014,2015,2018,2019,2020,2021,2022,2024];
-      const PAIRS = [[2,8],[5,11],[3,9],[6,12]];
-      let idx=0;
-      for(let i=0; i<YEARS_GA3.length && idx<EXTRA_CODES.length; i++){
-        const code = EXTRA_CODES[idx++]; if(LEGACY_ALIAS[code]){ i--; continue; }
-        LEGACY_ALIAS[code] = { type:'GA3', scenario:'A', year:YEARS_GA3[i], months:TRIPLETS[i%TRIPLETS.length] };
-      }
-      for(let j=0; j<YEARS_GA2.length && idx<EXTRA_CODES.length; j++){
-        const code = EXTRA_CODES[idx++]; if(LEGACY_ALIAS[code]){ j--; continue; }
-        LEGACY_ALIAS[code] = { type:'GA2', scenario:'A', year:YEARS_GA2[j], months:PAIRS[j%PAIRS.length] };
-      }
-    })();
-
-    function parseMonthsCompact(s){
-      const months=[];
-      for(let i=0;i<s.length;){
-        if(i+1<s.length){
-          const two = parseInt(s.slice(i,i+2),10);
-          if(two>=10 && two<=12){ months.push(two); i+=2; continue; }
-        }
-        const one = parseInt(s[i],10);
-        months.push(one); i+=1;
-      }
-      return months;
-    }
-
-    function resolveCardByCode(code){
-      if(CARD_DB[code]) return CARD_DB[code];
-      const alias = LEGACY_ALIAS[code];
-      if(alias){ return { type: alias.type, scenario: alias.scenario, year: alias.year, items: alias.months.map(m=>({ m, val: demandEU_truth(alias.scenario, alias.year, m) })) }; }
-      let m1 = new RegExp('^([AB])[- ]?(\\d{4})[- ]?((?:\\d{1,2}[- ]?){2,3})$').exec(code);
-      if(m1){ const scn=m1[1], year=+m1[2]; const months = m1[3].split(/[- ]/).filter(Boolean).map(x=>+x); if(months.length>=2 && months.length<=3){ return { type: months.length===2? 'GA2':'GA3', scenario:scn, year, items: months.map(mm=>({ m:mm, val: demandEU_truth(scn, year, mm) })) }; } }
-      let m2 = new RegExp('^([AB])(\\d{4})(\\d{3,6})$').exec(code);
-      if(m2){ const scn=m2[1], year=+m2[2]; const months = parseMonthsCompact(m2[3]); if(months.length>=2 && months.length<=3){ return { type: months.length===2? 'GA2':'GA3', scenario:scn, year, items: months.map(mm=>({ m:mm, val: demandEU_truth(scn, year, mm) })) }; } }
-      return null;
-    }
 
     // ================== Utils ==================
     function $(id){return document.getElementById(id)}
@@ -351,51 +298,148 @@
     function wRecency(y){ if(y>=2019) return 1.0; if(y>=2015) return 0.7; return 0.4 }
     function fmt(n){ return (n===null||n===undefined||Number.isNaN(n))? '—' : (+n.toFixed(2)).toString() }
 
+    // ================== Seed: 2011 sample (auto-insert, not a card) ==================
+    function seed2011(){
+      const s = state.scenario; if(!s) return;
+      // ---- Demand: fill ALL 12 months for 2011 based on 2010 base × 1.02
+      for(let m=1;m<=12;m++){
+        const base = BASE_2010[s][m-1];
+        const val = +(base*1.02).toFixed(1); // ~+2% vs 2010 across all months
+        const idx = state.demandCards.findIndex(d=>d.y===2011 && d.m===m);
+        if(idx>=0) state.demandCards[idx] = {y:2011,m,val}; else state.demandCards.push({y:2011,m,val});
+      }
+      // ---- Temperature: full 12 months present for 2011
+      const temps2011=[1.7,3.7,7.2,12.2,17.2,21.2,23.2,22.7,18.2,13.2,7.7,3.2];
+      const ti = state.tempCards.findIndex(t=>t.y===2011);
+      if(ti>=0) state.tempCards[ti] = {y:2011, temps: temps2011}; else state.tempCards.push({y:2011, temps: temps2011});
+      state._seed2011 = true;
+    }
+
     // ================== Pre-Result Accuracy ==================
     function computePreAcc(){
-      if(!state.started) return {score:0,label:'—',M:0,Div:0,Temp:0};
+      if(!state.started) return {score:0,label:'—',M:0,Div:0,Temp:0,TempSlots:0};
       const mNow = state.monthNow; let eff=0; const recentYears = new Set();
       for(const c of state.demandCards){ eff += wMonth(c.m, mNow) * wRecency(c.y); if(c.y>=2019) recentYears.add(c.y); }
       const M = Math.min(eff/12, 1);
       const Diversity = Math.min(recentYears.size/5, 1);
-      const TempEffect = Math.min(new Set(state.tempCards.map(t=>t.y)).size/6, 1);
-      let s = 100*(0.65*M + 0.20*Diversity + 0.15*TempEffect);
-      s = Math.round(clamp(s,30,95));
-      const label = s<50? '초보' : s<65? '보통' : s<80? '견고' : s<91? '정확' : '마스터';
-      return {score:s,label,M,Div:Diversity,Temp:TempEffect};
+      // Temperature coverage: month-aware weighted coverage across known months
+      let tEff=0; for(const t of state.tempCards){ for(let m=1;m<=12;m++){ const v=t.temps && t.temps[m-1]; if(v!=null){ tEff += wMonth(m,mNow) * wRecency(t.y); } } }
+      const TempEffect = Math.min(tEff/12, 1);
+      const TempSlots = Math.round(Math.min(tEff,12));
+      // Keep initial accuracy realistic with 2011 seed only (~20–35%)
+      const Seed = state._seed2011 ? 0.10 : 0; 
+      let s = 100*(Seed + 0.50*M + 0.22*Diversity + 0.13*TempEffect);
+      s = Math.round(clamp(s,20,95));
+      const label = s<40? '초보' : s<60? '보통' : s<80? '견고' : s<91? '정확' : '마스터';
+      return {score:s,label,M,Div:Diversity,Temp:TempEffect,TempSlots};
     }
     function renderAcc(){
-      const {score,label,M,Div,Temp} = computePreAcc();
+      const {score,label,M,Div,Temp,TempSlots} = computePreAcc();
       const meter = $("accMeter"); const bar = meter.querySelector('i');
       bar.style.transform = `scaleX(${score/100})`;
       meter.classList.remove('bad','ok','good');
       if(score<50) meter.classList.add('bad'); else if(score<70) meter.classList.add('ok'); else meter.classList.add('good');
       $("accLabel").textContent = `${score}% · ${label}`;
-      $("accExplain").textContent = `유효 표본 ${Math.round(M*12)}/12 · 최근연도 ${Math.round(Div*5)}/5 · 기온 ${Math.round(Temp*6)}/6`;
+      $("accExplain").textContent = `유효 표본 ${Math.round(M*12)}/12 · 최근연도 ${Math.round(Div*5)}/5 · 기온 ${TempSlots}/12`;
     }
 
-    // ================== Prediction (simple model) ==================
-    function estimateAlpha(){ let num=0, den=0; const mNow=state.monthNow; for(const c of state.demandCards){ const t=c.y-2010; if(t<=0) continue; const base=BASE_2010[state.scenario]?.[c.m-1]; if(!base) continue; const ratio=c.val/base; const est=(ratio-1)/t; const w=wMonth(c.m,mNow)*wRecency(c.y); num+=est*w; den+=w; } return clamp(den>0? num/den : 0, 0, 0.05); }
-    function estimateTempDelta(){
-      const T=state.tempCards; if(T.length<2) return 0;
-      const pairs = T.map(t=>({ y:t.y, avg: t.temps && t.temps.length===12 ? t.temps.reduce((a,b)=>a+b,0)/12 : null }))
-                     .filter(p=>p.avg!==null)
-                     .sort((a,b)=>a.y-b.y);
-      if(pairs.length<2) return 0;
-      const xs=pairs.map(p=>p.y), ys=pairs.map(p=>p.avg); const n=xs.length;
-      const xbar=xs.reduce((a,b)=>a+b,0)/n, ybar=ys.reduce((a,b)=>a+b,0)/n; let num=0,den=0;
-      for(let i=0;i<n;i++){ num+=(xs[i]-xbar)*(ys[i]-ybar); den+=(xs[i]-xbar)**2; }
-      let slope=den>0? num/den:0; slope=clamp(slope,0,0.1); return slope*(2025-2010);
+    // ================== Prediction (weighted OLS regression) ==================
+    const RIDGE = 1e-6;
+
+    function getAvgTempByYear(y){
+      const t = state.tempCards.find(t=>t.y===y);
+      if(t && t.temps && t.temps.length===12){
+        return t.temps.reduce((a,b)=>a+b,0)/12;
+      }
+      // 없으면 합성 monthly로 계산
+      const est = synthMonthlyTemps(y); return est.reduce((a,b)=>a+b,0)/12;
     }
-    function computeUncertainty(){ if(!state.started) return 4.0; const pre=computePreAcc(); const m=pre.M; let w = 4.0 - 2.0*m - 0.8*(state.round-1); if(state.round>=4) w = Math.min(w, 1.0); return clamp(w, 1.0, 5.0); }
-    function predictCurrent(){ if(!state.started) return null; const mIdx=state.monthNow-1; const base=BASE_2010[state.scenario][mIdx]; const a=estimateAlpha(); const growth=1+a*(2025-2010); const dT=estimateTempDelta(); const beta=BETA[mIdx]; const tempF=1+beta*dT; const yhat=base*growth*tempF; const w=computeUncertainty(); return {yhat, min:yhat-w, max:yhat+w, width:w}; }
+
+    function weightedOLS(X, y, w){
+      const p = X[0].length; const XtWX = Array.from({length:p},()=>Array(p).fill(0));
+      const XtWy = Array(p).fill(0); let nEff=0;
+      for(let i=0;i<X.length;i++){
+        const wi = w[i]; nEff += wi;
+        for(let a=0;a<p;a++){
+          XtWy[a] += X[i][a]*y[i]*wi;
+          for(let b=0;b<p;b++) XtWX[a][b] += X[i][a]*X[i][b]*wi;
+        }
+      }
+      for(let d=0; d<p; d++){ XtWX[d][d] += RIDGE; }
+      const A = XtWX.map((row,i)=>row.concat([XtWy[i]]));
+      for(let col=0; col<p; col++){
+        let piv=col; for(let r=col+1;r<p;r++) if(Math.abs(A[r][col])>Math.abs(A[piv][col])) piv=r;
+        if(Math.abs(A[piv][col])<1e-10) return null;
+        if(piv!==col){ const tmp=A[col]; A[col]=A[piv]; A[piv]=tmp; }
+        const div=A[col][col]; for(let c=col;c<=p;c++) A[col][c]/=div;
+        for(let r=0;r<p;r++) if(r!==col){ const factor=A[r][col]; for(let c=col;c<=p;c++) A[r][c]-=factor*A[col][c]; }
+      }
+      const beta = A.map(row=>row[p]);
+      let rss=0, wsum=0; for(let i=0;i<X.length;i++){ let yhat=0; for(let j=0;j<p;j++) yhat+=beta[j]*X[i][j]; const e=y[i]-yhat; rss += w[i]*e*e; wsum+=w[i]; }
+      const dof = Math.max(1, X.length - p);
+      const residSD = Math.sqrt(rss/Math.max(1e-9, dof));
+      return {beta, residSD, nEff};
+    }
+
+    function buildRegressionModel(){
+      if(!state.scenario) return null;
+      const X=[], y=[], w=[];
+      for(const s of state.demandCards){
+        const base = BASE_2010[state.scenario]?.[s.m-1]; if(base==null) continue;
+        const t = s.y - 2010;
+        const tempM = getMonthlyTemp(s.y, s.m);
+        const feat = [1, base, t, tempM];
+        X.push(feat); y.push(s.val); w.push(wMonth(s.m, state.monthNow)*wRecency(s.y));
+      }
+      if(X.length<2) return null;
+      return weightedOLS(X,y,w);
+    }
+
+    // ---- Uncertainty driven by pre-score (accuracy) ----
+    function widthFromAccuracy(score){
+      // 20% → ~3.0 GWh, 50% → ~2.0, 70% → ~1.3, 85% → ~0.9, 95% → ~0.7
+      return clamp(3.4 - 0.03*score, 0.6, 3.2);
+    }
+    function computeUncertainty(model){
+      if(!state.started) return 3.0;
+      const pre = computePreAcc();
+      let w = widthFromAccuracy(pre.score);
+      if(model && Number.isFinite(model.residSD)){
+        w = Math.max(model.residSD*1.6, w*0.9);
+      }
+      w *= (1 - 0.06*(state.round-1));
+      if(state.round>=4) w = Math.min(w, 0.9);
+      return clamp(w, 0.6, 3.2);
+    }
+
+    function predictCurrent(){
+      if(!state.started) return null;
+      const mIdx = state.monthNow-1;
+      const base = BASE_2010[state.scenario][mIdx];
+      const model = buildRegressionModel();
+      if(model && model.beta){
+        const temp2025 = getAvgTempByYear(2025) ?? 15.0;
+        const x = [1, base, (2025-2010), temp2025];
+        let yhat = model.beta[0]*x[0] + model.beta[1]*x[1] + model.beta[2]*x[2] + model.beta[3]*x[3];
+        if(!Number.isFinite(yhat)) yhat = base;
+        yhat = Math.max(0.5*base, yhat);
+        const w = computeUncertainty(model);
+        return {yhat, min:yhat-w, max:yhat+w, width:w};
+      }
+      const ALPHA_CAP = 0.02;
+      let num=0,den=0; for(const c of state.demandCards){ const t=c.y-2010; if(t<=0) continue; const b=BASE_2010[state.scenario]?.[c.m-1]; if(!b) continue; const r=c.val/b; const est=(r-1)/t; const wt=wMonth(c.m,state.monthNow)*wRecency(c.y); num+=est*wt; den+=wt; }
+      const a = clamp(den>0? num/den : 0, 0, ALPHA_CAP);
+      const growth=1+a*(2025-2010);
+      let yhat = base*growth; const w = computeUncertainty(null);
+      return {yhat, min:yhat-w, max:yhat+w, width:w};
+    }
 
     // ================== Chart (bar: monthly demand, line: monthly temp) ==================
-    let chart; let currentChartYear = 2010; const roundHighlights = new Set();
+    let chart; let currentChartYear = 2011; const roundHighlights = new Set();
     function addHighlight(year){ const el=document.getElementById(`tab-year-${year}`); if(el){ el.classList.add('hl'); roundHighlights.add(year);} }
     function clearHighlights(){ for(const y of roundHighlights){ const el=document.getElementById(`tab-year-${y}`); if(el){ el.classList.remove('hl'); } } roundHighlights.clear(); }
     function updateChart(year){
-      document.querySelectorAll('#yearTabs button').forEach(b=>b.classList.remove('active'));
+      document.querySelectorAll('#yearTabs button').forEach(b=>{ b.classList.remove('active'); });
       const act=document.getElementById(`tab-year-${year}`); if(act) act.classList.add('active');
       if(!state.scenario){ return; }
       currentChartYear = year;
@@ -405,19 +449,12 @@
         const d=state.demandCards.find(c=>c.y===year && c.m===i+1);
         return d? d.val : null;
       });
-      if(year===2010 && demand.every(v=>v===null)){
-        demand = BASE_2010[state.scenario].slice();
-      }
 
       const tEntry = state.tempCards.find(t=>t.y===year);
       const tempLine = tEntry? tEntry.temps : Array(12).fill(null);
 
-      const datasets = [
-        { label: '전력수요(EU)', data: demand, yAxisID:'y', type:'bar', backgroundColor: '#6ea8ff', borderRadius: 6 }
-      ];
-      if(year===2010){
-        datasets.push({ label:'기초(2010) EU', data: BASE_2010[state.scenario], yAxisID:'y', type:'line', borderColor:'#9ad0ff', borderWidth:2, borderDash:[6,4], pointRadius:0 });
-      }
+      const datasets = [{ label: '전력수요(GWh)', data: demand, yAxisID:'y', type:'bar', backgroundColor: '#6ea8ff', borderRadius: 6 }];
+      if(year===2010){ datasets.push({ label:'기초(2010) GWh', data: BASE_2010[state.scenario], yAxisID:'y', type:'line', borderColor:'#9ad0ff', borderWidth:2, borderDash:[6,4], pointRadius:0 }); }
       datasets.push({ label: '월별기온(°C)', data: tempLine, yAxisID:'y1', type:'line', borderColor:'#ffd166', borderWidth:2, spanGaps:true, pointRadius:2 });
 
       if(chart) chart.destroy();
@@ -431,7 +468,7 @@
         }
       });
 
-      $("yearSummary").textContent = `연도 ${year} · 시나리오 ${state.scenario} · 월별기온: ${tEntry? '입력됨' : '?'}`;
+      $("yearSummary").textContent = `연도 ${year} · 월별기온: ${tEntry? '입력됨' : '?'}`;
       const tb = $("yearTable").querySelector('tbody'); tb.innerHTML='';
       for(let i=0;i<12;i++){
         const tr=document.createElement('tr');
@@ -445,7 +482,20 @@
     function buildYearTabs(){ const tabs=$("yearTabs"); tabs.innerHTML=''; for(let y=2010;y<=2024;y++){ const b=document.createElement('button'); b.id=`tab-year-${y}`; b.textContent=y; b.addEventListener('click',()=>updateChart(y)); tabs.appendChild(b);} }
 
     // ================== Lists & Modal helpers ==================
-    function renderAppliedList(){ const el=$("appliedList"); el.textContent = state.appliedCodes.length? ('적용된 코드: '+state.appliedCodes.join(', ')) : '적용된 코드 없음'; }
+    function renderAppliedList(){
+      const el=$("appliedList");
+      if(!state.appliedCodes.length){ el.textContent='적용된 코드 없음'; return; }
+      el.innerHTML = state.appliedCodes.map(c=>`<span class="badge" data-code="${c}" style="cursor:pointer">${c}</span>`).join(' ');
+      el.querySelectorAll('span.badge').forEach(chip=>{
+        chip.addEventListener('click', ()=>{
+          const r = state.cardDB[chip.dataset.code];
+          if(!r) return;
+          let y = r.year;
+          if(!y && r.items && r.items.length){ y = r.items[0].y; }
+          if(y){ updateChart(y); addHighlight(y); }
+        });
+      });
+    }
     function showCodeError(msg){ const m=$("codeErrorModal"); $("codeErrorText").textContent=msg; m.style.display='flex'; }
     function closeCodeError(){ const m=$("codeErrorModal"); m.style.display='none'; $("codeInput").focus(); }
 
@@ -454,20 +504,28 @@
 
     // ================== Code Apply ==================
     function applyCode(){
-      const code = $("codeInput").value.trim().toUpperCase();
+      const raw = $("codeInput").value.trim();
+      const code = raw.toUpperCase();
       if(!code){ showCodeError('코드를 입력하세요'); return; }
-      const card = resolveCardByCode(code);
+      const card = state.cardDB[code] || null;
       if(!card){ showCodeError('해당 코드를 찾을 수 없습니다.'); return; }
       if(state.appliedCodes.includes(code)){ showCodeError('이미 적용된 코드입니다.'); return; }
+      if((card.type==='GA2' || card.type==='GA3' || card.type==='GA6') && !state.scenario){ showCodeError('새 게임 시작 후 사용하세요.'); return; }
       if((card.scenario||state.scenario) && state.scenario && card.scenario && card.scenario!==state.scenario){ showCodeError(`현재 시나리오(${state.scenario})와 다른 카드입니다.`); return; }
 
       const affectedYears = new Set();
-      if(card.type==='GA2' || card.type==='GA3'){
+      if(card.type==='GA2' || card.type==='GA3' || card.type==='GA6'){
         const y = card.year; affectedYears.add(y);
+        // ensure temp container exists for that year
+        let tIdx = state.tempCards.findIndex(t=>t.y===y);
+        if(tIdx<0){ state.tempCards.push({y, temps:Array(12).fill(null)}); tIdx = state.tempCards.length-1; }
         for(const item of card.items){
-          const {m,val} = item;
+          const {m,val,temp} = item;
+          // demand merge
           const idx = state.demandCards.findIndex(d=>d.y===y && d.m===m);
           if(idx>=0) state.demandCards[idx] = {y,m,val}; else state.demandCards.push({y,m,val});
+          // temperature merge (month-level)
+          state.tempCards[tIdx].temps[m-1] = temp;
         }
       } else if(card.type==='NA2'){
         for(const t of card.items){
@@ -481,12 +539,36 @@
       state.appliedCodes.push(code);
       $("codeInput").value='';
       renderAppliedList(); renderAcc();
-      for(const y of affectedYears){ addHighlight(y); }
+      const years=[...affectedYears];
+      if(years.length){
+        const prefer = years.includes(currentChartYear) ? currentChartYear : years.sort((a,b)=>a-b)[years.length-1];
+        updateChart(prefer);
+        addHighlight(prefer);
+      }
     }
 
     // ================== Log & Export ==================
-    function appendLog(pred){ const tb=$("logTable").querySelector('tbody'); const tr=document.createElement('tr'); const pre=computePreAcc(); tr.innerHTML=`<td>${state.round}</td><td>${MONTHS[state.monthNow-1]}</td><td>${pre.score}%</td><td>${fmt(pred.yhat)}</td>`; tb.appendChild(tr); }
-    function exportCSV(){ const rows=[["round","month","pre_accuracy","predicted_eu"]]; const tb=$("logTable").querySelector('tbody'); for(const tr of tb.querySelectorAll('tr')){ const tds=[...tr.children].map(td=>td.textContent); rows.push([tds[0],tds[1],tds[2],tds[3]]);} const csv=rows.map(r=>r.join(',')).join('\n'); const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='idpp_forecaster_log.csv'; a.click(); }
+    function appendLog(pred){
+      const tb=$("logTable").querySelector('tbody');
+      const tr=document.createElement('tr');
+      const pre=computePreAcc();
+      const gwhRange = `${fmt(pred.min)} ~ ${fmt(pred.max)}`;
+      tr.innerHTML=`<td>${state.round}</td><td>${MONTHS[state.monthNow-1]}</td><td>${pre.score}%</td><td>${gwhRange}</td>`;
+      tb.appendChild(tr);
+    }
+    function buildCSV(rows){ return rows.map(r=>r.join(',')).join('\n'); }
+    function exportCSV(){
+      const rows=[["round","month","pre_accuracy","predicted_gwh_min","predicted_gwh_max"]];
+      const tb=$("logTable").querySelector('tbody');
+      for(const tr of tb.querySelectorAll('tr')){
+        const tds=[...tr.children].map(td=>td.textContent);
+        const g = tds[3].split('~').map(s=>s.trim());
+        rows.push([tds[0],tds[1],tds[2], g[0], g[1]]);
+      }
+      const csv = buildCSV(rows);
+      const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+      const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='idpp_forecaster_log.csv'; a.click();
+    }
 
     // ================== Modal & Start/Reset ==================
     function populateStartMonth(){ const sel=$("startMonth"); sel.innerHTML=''; for(let i=1;i<=12;i++){ const o=document.createElement('option'); o.value=i; o.textContent=MONTHS[i-1]; sel.appendChild(o);} }
@@ -497,17 +579,22 @@
     function closeConfirmReset(){ $("confirmReset").style.display='none'; }
 
     function startGame(){
-      state.started=true; state.round=1; state.monthNow = +$("startMonth").value; state.scenario=$("scenarioSelect").value;
+      state.started=true; state.round=1; state.monthNow = +$("startMonth").value; state.scenario='A';
       $("roundNow").textContent = state.round;
       $("monthNow").textContent = MONTHS[state.monthNow-1];
-      $("scenarioNow").textContent = state.scenario;
+      
       $("btnPredict").disabled=false; $("btnNext").disabled=false;
-      renderAcc(); buildYearTabs(); updateChart(2010);
+      // seed 2011 sample data (not card-based)
+      seed2011();
+      renderAcc(); buildYearTabs(); updateChart(2011);
     }
 
-    function resetState(){ state.started=false; state.round=0; state.monthNow=1; state.scenario=null; state.demandCards=[]; state.tempCards=[]; state.appliedCodes=[]; $("predRange").value='—'; $("roundNow").textContent='—'; $("monthNow").textContent='—'; $("scenarioNow").textContent='—'; renderAppliedList(); renderAcc(); const tb=$("logTable").querySelector('tbody'); tb.innerHTML=''; $("yearTabs").innerHTML=''; $("yearSummary").textContent=''; $("yearTable").querySelector('tbody').innerHTML=''; if(chart){ chart.destroy(); chart=null; } }
+    function resetState(){ state.started=false; state.round=0; state.monthNow=1; state.scenario=null; state.demandCards=[]; state.tempCards=[]; state.appliedCodes=[]; $("predRange").value='—'; $("roundNow").textContent='—'; $("monthNow").textContent='—';  renderAppliedList(); renderAcc(); const tb=$("logTable").querySelector('tbody'); tb.innerHTML=''; $("yearTabs").innerHTML=''; $("yearSummary").textContent=''; $("yearTable").querySelector('tbody').innerHTML=''; if(chart){ chart.destroy(); chart=null; }  }
 
     function init(){
+      state.cardDB = CARD_DB; injectGA6();
+      
+
       $("btnNewGame").addEventListener('click', ()=>{ if(state.started){ openConfirmReset(); } else { populateStartMonth(); openModal(); } });
       $("btnResetNo").addEventListener('click', closeConfirmReset);
       $("btnResetYes").addEventListener('click', ()=>{ closeConfirmReset(); resetState(); populateStartMonth(); openModal(); });
@@ -531,35 +618,35 @@
     // ================== Lightweight Self Tests ==================
     function runSelfTests(){
       try{
-        console.groupCollapsed('[SelfTest] Forecaster');
+        console.groupCollapsed('[SelfTest] Forecaster GWh');
         console.assert(monthDiff(1,12)===1, 'monthDiff wrap-around');
         console.assert(wMonth(5,5)===1.0 && wMonth(5,6)>wMonth(5,8), 'wMonth weights');
         console.assert(typeof buildYearTabs==='function', 'buildYearTabs defined');
         const pre0 = computePreAcc();
         console.assert(pre0.score===0 && pre0.label==='—', 'pre-accuracy when not started');
-        // temp coverage 2010~2024
-        const tempYears = new Set(); Object.entries(CARD_DB).forEach(([k,v])=>{ if(v.type==='NA2'){ v.items.forEach(it=> tempYears.add(it.y)); }});
-        for(let y=2010;y<=2024;y++){ console.assert(tempYears.has(y), 'temp coverage year '+y); }
-        const vgv = CARD_DB['VGV']; console.assert(vgv && vgv.items[0].temps.length===12, 'VGV has 12 monthly temps');
-        // legacy resolver tests
-        const rcVAD = resolveCardByCode('VAD'); console.assert(rcVAD && rcVAD.type==='GA3' && rcVAD.year===2017, 'resolve VAD');
-        const rcLGY = resolveCardByCode('LGY'); console.assert(rcLGY && rcLGY.type==='GA2' && rcLGY.year===2011 && rcLGY.items.length===2, 'resolve LGY');
-        const rcAGR = resolveCardByCode('AGR'); console.assert(rcAGR && rcAGR.type==='GA3' && rcAGR.year===2012 && rcAGR.items.length===3, 'resolve AGR');
-        const rcNYP = resolveCardByCode('NYP'); console.assert(rcNYP && rcNYP.type==='GA2' && rcNYP.year===2014 && rcNYP.items.length===2, 'resolve NYP');
-        const rcUJM = resolveCardByCode('UJM'); console.assert(rcUJM && (rcUJM.type==='GA2' || rcUJM.type==='GA3'), 'resolve UJM');
+        console.assert(predictCurrent()===null, 'predictCurrent should be null before start');
+        buildYearTabs(); const tabs = $("yearTabs"); console.assert(tabs.children.length===15, 'yearTabs should have 15 buttons');
 
-        buildYearTabs();
-        const tabs = $("yearTabs"); console.assert(tabs.children.length===15, 'yearTabs should have 15 buttons');
+        // GA6 DB sanity
+        console.assert(CARD_DB['B2Q'] && CARD_DB['B2Q'].items && CARD_DB['B2Q'].items[0].hasOwnProperty('temp'), 'GA6 item carries temp');
 
-        // Uncertainty narrowing check
+        // Seed simulation
         const snap = JSON.parse(JSON.stringify({ started: state.started, scenario: state.scenario, round: state.round, monthNow: state.monthNow, demandCards: state.demandCards, tempCards: state.tempCards, appliedCodes: state.appliedCodes }));
-        state.started=true; state.round=1; let w1=computeUncertainty(); state.round=4; let w4=computeUncertainty(); console.assert(w4<=w1 && w4<=1.0, 'uncertainty narrows and <=1 at R4');
-        // restore state
+        state.started=true; state.round=1; state.monthNow=1; state.scenario='A'; state.demandCards=[]; state.tempCards=[]; seed2011();
+        const seeded2011 = state.demandCards.filter(d=>d.y===2011).length===12;
+        console.assert(seeded2011, '2011 seeded with 12 demand months');
+        const pre1 = computePreAcc();
+        console.assert(pre1.score>=20 && pre1.score<=35, 'initial accuracy realistic (20-35%)');
+        const model = buildRegressionModel(); const u1 = computeUncertainty(model);
+        state.round=4; const u4 = computeUncertainty(model);
+        console.assert(u4<u1 && u4<=0.9, 'uncertainty narrows and <=0.9 at R4');
+
+        // Extra sanity: prediction object shape
+        const p = predictCurrent(); console.assert(p && typeof p.min==='number' && typeof p.max==='number', 'predictCurrent returns range');
+
         state.started=snap.started; state.scenario=snap.scenario; state.round=snap.round; state.monthNow=snap.monthNow; state.demandCards=snap.demandCards; state.tempCards=snap.tempCards; state.appliedCodes=snap.appliedCodes;
         console.groupEnd();
-      } catch(e) {
-        console.warn('SelfTest failed', e);
-      }
+      } catch(e) { console.warn('SelfTest failed', e); }
     }
   </script>
 </body>
